@@ -1,0 +1,59 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group = 'org.SmartAI_Agent'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // JUnit for testing
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    // Gson for JSON parsing
+    implementation 'com.google.code.gson:gson:2.10.1'
+
+    // Dotenv for environment variables from .env file
+    implementation 'io.github.cdimascio:java-dotenv:5.2.2'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+application {
+    mainClass = 'org.SmartAI_Agent.SmartHomeApplication'
+}
+
+// Create a fat jar for easier execution
+jar {
+    manifest {
+        attributes(
+            'Main-Class': 'org.SmartAI_Agent.SmartHomeApplication'
+        )
+    }
+}
+
+// Task to create a fat JAR with all dependencies
+task fatJar(type: Jar) {
+    archiveClassifier = 'all'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    manifest {
+        attributes 'Main-Class': 'org.SmartAI_Agent.SmartHomeApplication'
+    }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    with jar
+}
+
+// Task to run the input test
+task runInputTest(type: JavaExec) {
+    mainClass = 'org.SmartAI_Agent.InputTest'
+    classpath = sourceSets.main.runtimeClasspath + sourceSets.test.runtimeClasspath
+}
