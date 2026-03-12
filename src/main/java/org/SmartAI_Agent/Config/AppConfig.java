@@ -10,47 +10,73 @@ import org.SmartAI_Agent.core.IntentAnalyzer;
 import org.SmartAI_Agent.core.MainOrchestrator;
 import org.SmartAI_Agent.core.ResponseBuilder;
 import org.SmartAI_Agent.core.SystemContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * AppConfig - Central configuration class for the SmartHome AI Agent system
  * Initializes all components and manages their dependencies
  */
+@Configuration
 public class AppConfig {
-    
-    private IntentAnalyzer intentAnalyzer;
-    private ResponseBuilder responseBuilder;
-    private SystemContext systemContext;
-    private OpenAIService openAIService;
-    private ClaudeAI claudeAI;
-    private DeepSeekService deepSeekService;
-    private SecurityAgent securityAgent;
-    private ApplianceAgent applianceAgent;
-    private ClimateAgent climateAgent;
-    private MainOrchestrator mainOrchestrator;
-    
+
     /**
      * Initialize all system components
      */
-    public void initialize() {
-        // Initialize core services
-        responseBuilder = new ResponseBuilder();
-        systemContext = new SystemContext();
-        
-        // Initialize LLM services
-        openAIService = new OpenAIService();
-        claudeAI = new ClaudeAI();
-        deepSeekService = new DeepSeekService();
-        
-        // Initialize intent analyzer with AI providers
-        intentAnalyzer = new IntentAnalyzer();
-        
-        // Initialize agents
-        securityAgent = new SecurityAgent();
-        applianceAgent = new ApplianceAgent();
-        climateAgent = new ClimateAgent();
-        
-        // Initialize main orchestrator
-        mainOrchestrator = new MainOrchestrator(
+    @Bean
+    public ResponseBuilder responseBuilder() {
+        return new ResponseBuilder();
+    }
+
+    @Bean
+    public SystemContext systemContext() {
+        return new SystemContext();
+    }
+
+    @Bean
+    public OpenAIService openAIService() {
+        return new OpenAIService();
+    }
+
+    @Bean
+    public ClaudeAI claudeAI() {
+        return new ClaudeAI();
+    }
+
+    @Bean
+    public DeepSeekService deepSeekService() {
+        return new DeepSeekService();
+    }
+
+    @Bean
+    public IntentAnalyzer intentAnalyzer() {
+        return new IntentAnalyzer();
+    }
+
+    @Bean
+    public SecurityAgent securityAgent() {
+        return new SecurityAgent();
+    }
+
+    @Bean
+    public ApplianceAgent applianceAgent() {
+        return new ApplianceAgent();
+    }
+
+    @Bean
+    public ClimateAgent climateAgent() {
+        return new ClimateAgent();
+    }
+
+    @Bean
+    public MainOrchestrator mainOrchestrator(
+            SecurityAgent securityAgent,
+            ApplianceAgent applianceAgent,
+            ClimateAgent climateAgent,
+            IntentAnalyzer intentAnalyzer,
+            ResponseBuilder responseBuilder,
+            SystemContext systemContext) {
+        return new MainOrchestrator(
             securityAgent,
             applianceAgent,
             climateAgent,
@@ -58,47 +84,5 @@ public class AppConfig {
             responseBuilder,
             systemContext
         );
-    }
-    
-    // Getters for all components
-    
-    public IntentAnalyzer getIntentAnalyzer() {
-        return intentAnalyzer;
-    }
-    
-    public ResponseBuilder getResponseBuilder() {
-        return responseBuilder;
-    }
-    
-    public SystemContext getSystemContext() {
-        return systemContext;
-    }
-    
-    public OpenAIService getOpenAIService() {
-        return openAIService;
-    }
-    
-    public ClaudeAI getClaudeAI() {
-        return claudeAI;
-    }
-
-    public DeepSeekService getDeepSeekService() {
-        return deepSeekService;
-    }
-
-    public SecurityAgent getSecurityAgent() {
-        return securityAgent;
-    }
-    
-    public ApplianceAgent getApplianceAgent() {
-        return applianceAgent;
-    }
-    
-    public ClimateAgent getClimateAgent() {
-        return climateAgent;
-    }
-    
-    public MainOrchestrator getMainOrchestrator() {
-        return mainOrchestrator;
     }
 }

@@ -24,6 +24,7 @@ public class ApplianceAgent extends BaseAgent {
     private static final String CTX_FRIDGE_STATUS = "fridge_status";
     private static final String CTX_MICROWAVE_STATUS = "microwave_status";
     private static final String CTX_OVEN_STATUS = "oven_status";
+    private static final String CTX_COOKER_STATUS = "cooker_status";
     private static final String CTX_TV_STATUS = "tv_status";
     private static final String CTX_TV_LOCATION_PREFIX = "tv_status_";
 
@@ -56,6 +57,7 @@ public class ApplianceAgent extends BaseAgent {
         updateContext(CTX_FRIDGE_STATUS, "on");  // Fridge is typically always on
         updateContext(CTX_MICROWAVE_STATUS, "off");
         updateContext(CTX_OVEN_STATUS, "off");
+        updateContext(CTX_COOKER_STATUS, "off");
         
         // TV statuses by location
         updateContext(CTX_TV_STATUS, "off");
@@ -80,6 +82,7 @@ public class ApplianceAgent extends BaseAgent {
         addManagedDevice(new Device("dishwasher_001", "Dishwasher", "dishwasher", "kitchen", "kitchen"));
         addManagedDevice(new Device("microwave_001", "Microwave", "microwave", "kitchen", "kitchen"));
         addManagedDevice(new Device("oven_001", "Oven", "oven", "kitchen", "kitchen"));
+        addManagedDevice(new Device("cooker_001", "Cooker", "cooker", "kitchen", "kitchen"));
         addManagedDevice(new Device("tv_001", "Living Room TV", "tv", "entertainment", "living_room"));
         addManagedDevice(new Device("tv_002", "Bedroom TV", "tv", "entertainment", "bedroom"));
         
@@ -114,6 +117,9 @@ public class ApplianceAgent extends BaseAgent {
                 device.addCapability("turn_on");
                 device.addCapability("turn_off");
             } else if (device.getType().equals("oven")) {
+                device.addCapability("turn_on");
+                device.addCapability("turn_off");
+            } else if (device.getType().equals("cooker")) {
                 device.addCapability("turn_on");
                 device.addCapability("turn_off");
             } else if (device.getType().equals("tv")) {
@@ -345,6 +351,7 @@ public class ApplianceAgent extends BaseAgent {
         updateContext(CTX_DISHWASHER_STATUS, "off");
         updateContext(CTX_MICROWAVE_STATUS, "off");
         updateContext(CTX_OVEN_STATUS, "off");
+        updateContext(CTX_COOKER_STATUS, "off");
         updateContext(CTX_TV_STATUS, "off");
         updateContext(CTX_TV_LOCATION_PREFIX + "living_room", "off");
         updateContext(CTX_TV_LOCATION_PREFIX + "bedroom", "off");
@@ -384,6 +391,10 @@ public class ApplianceAgent extends BaseAgent {
                 return handleMicrowaveControl(action);
             case "oven":
                 return handleOvenControl(action);
+            case "cooker":
+            case "stove":
+            case "range":
+                return handleCookerControl(action);
             case "dishwasher":
                 return handleDishwasherControl(action);
             case "dryer":
@@ -681,6 +692,29 @@ public class ApplianceAgent extends BaseAgent {
     }
 
     /**
+     * Handle cooker control
+     */
+    private Response handleCookerControl(String action) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("appliance", "cooker");
+        data.put("action", action);
+        data.put("device_id", "cooker_001");
+        
+        if ("turn_on".equals(action)) {
+            updateContext(CTX_COOKER_STATUS, "on");
+            data.put("status", "on");
+            return buildDataResponse("Cooker turned on.", data);
+        } else if ("turn_off".equals(action)) {
+            updateContext(CTX_COOKER_STATUS, "off");
+            data.put("status", "off");
+            return buildDataResponse("Cooker turned off.", data);
+        }
+        
+        data.put("status", getContextValue(CTX_COOKER_STATUS));
+        return buildDataResponse("Cooker control command executed.", data);
+    }
+
+    /**
      * Handle dishwasher control
      */
     private Response handleDishwasherControl(String action) {
@@ -810,6 +844,7 @@ public class ApplianceAgent extends BaseAgent {
         previousState.put(CTX_OVEN_STATUS, getContextValue(CTX_OVEN_STATUS));
         previousState.put(CTX_MICROWAVE_STATUS, getContextValue(CTX_MICROWAVE_STATUS));
         previousState.put(CTX_DISHWASHER_STATUS, getContextValue(CTX_DISHWASHER_STATUS));
+        previousState.put(CTX_COOKER_STATUS, getContextValue(CTX_COOKER_STATUS));
         
         // Emergency shutdown of all appliances
         updateContext(CTX_LIGHTS_ON, false);
@@ -819,6 +854,7 @@ public class ApplianceAgent extends BaseAgent {
         updateContext(CTX_DISHWASHER_STATUS, "emergency_stop");
         updateContext(CTX_OVEN_STATUS, "emergency_stop");
         updateContext(CTX_MICROWAVE_STATUS, "emergency_stop");
+        updateContext(CTX_COOKER_STATUS, "emergency_stop");
         updateContext(CTX_TV_STATUS, "off");
         updateContext(CTX_TV_LOCATION_PREFIX + "living_room", "off");
         updateContext(CTX_TV_LOCATION_PREFIX + "bedroom", "off");

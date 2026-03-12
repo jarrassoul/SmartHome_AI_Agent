@@ -244,6 +244,24 @@ public class IntentAnalyzer {
             return intent;
         }
 
+        // Check for cooker commands
+        if (lowerInput.contains("cooker") || lowerInput.contains("stove") || lowerInput.contains("range")) {
+            intent.setAction("control_appliance");
+            intent.setDomain("appliance");
+            intent.setConfidence(0.9);
+            Map<String, Object> params = new HashMap<>();
+            params.put("appliance", "cooker");
+            if (lowerInput.contains("on")) {
+                params.put("action", "turn_on");
+            } else if (lowerInput.contains("off")) {
+                params.put("action", "turn_off");
+            } else {
+                params.put("action", "control");
+            }
+            intent.setParameters(params);
+            return intent;
+        }
+
         // Check for climate/temperature commands
         if (lowerInput.contains("temperature") || lowerInput.contains("thermostat") ||
                 lowerInput.contains("ac") || lowerInput.contains("air conditioner") ||
@@ -422,6 +440,20 @@ public class IntentAnalyzer {
             intent.setAction("brew_coffee");
             intent.setDomain("appliance");
             intent.setConfidence(0.9);
+        } else if (lowerInput.contains("cooker") || lowerInput.contains("stove") || lowerInput.contains("range")) {
+            intent.setAction("control_appliance");
+            intent.setDomain("appliance");
+            intent.setConfidence(0.9);
+            Map<String, Object> params = new HashMap<>();
+            params.put("appliance", "cooker");
+            if (lowerInput.contains("on")) {
+                params.put("action", "turn_on");
+            } else if (lowerInput.contains("off")) {
+                params.put("action", "turn_off");
+            } else {
+                params.put("action", "control");
+            }
+            intent.setParameters(params);
         } else {
             intent.setAction("unknown");
             intent.setDomain("general");
